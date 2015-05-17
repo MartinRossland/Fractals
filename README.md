@@ -2,6 +2,11 @@
 
 Fractals is a java library for creating different types of fractals.
 
+What is fractals and what is mandelbrot:
+
+  - http://en.wikipedia.org/wiki/Fractal
+  - http://en.wikipedia.org/wiki/Mandelbrot_set
+
 ### Implemented fractals:
 
   - Mandelbrot
