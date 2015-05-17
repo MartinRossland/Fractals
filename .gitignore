@@ -15,3 +15,10 @@ nb-configuration.xml
 *.jar
 *.war
 *.ear
+/FractalImpl/nbproject/private/
+/MandelbrotApi/nbproject/private/
+/MandelbrotImpl/nbproject/private/
+/FractalApi/nbproject/private/
+/FractalFormatterAsciiImpl/nbproject/private/
+/FractalFormatterApi/nbproject/private/
+/MandelbrotTest/nbproject/private/
