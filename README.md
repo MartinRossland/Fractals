@@ -22,7 +22,7 @@ Fractals is a java library for creating different types of fractals.
 
 ### Testing:
 
-Use the MandelbrotTest project to play around with different configurations and settings.
+Use the MandelbrotTest project to play around with different configurations.
 
 ### Mandelbrot result using formatter
 
