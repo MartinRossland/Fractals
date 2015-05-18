@@ -61,7 +61,7 @@ public class Test {
         fractal.getConfig()
                 .setWidth(1920)
                 .setHeight(1200)
-                .setMaxIterations(50);
+                .setMaxIterations(1000);
                 
         System.out.println("Renderer: " + PngRenderer.class);
 
@@ -69,7 +69,9 @@ public class Test {
                          
         // TODO: add check whether fractal is done processing when we implement
         // parallel processing   
-        File file = new File(System.getenv("HOME"), "mandelbrot.png");        
+        File file = new File(
+                System.getenv("HOME"), 
+                "mandelbrot-" + fractal.getConfig().getWidth() + "x" + fractal.getConfig().getWidth() + "-" + fractal.getConfig().getMaxIterations() + "i.png");        
         
         // Create file if not exists
         if(file.exists()) {

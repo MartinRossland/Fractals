@@ -33,3 +33,5 @@ nb-configuration.xml
 /FractalsRendererAsciiImpl/nbproject/private/
 /FractalsTest/nbproject/private/
 /FractalsRendererPngImpl/nbproject/private/
+
+.DS_Store
