@@ -24,10 +24,9 @@
 package com.fractals.test;
 
 import com.fractals.renderer.ascii.impl.AsciiRenderer;
-import com.fractals.fractal.mandelbrot.Mandelbrot;
 import com.fractals.fractal.mandelbrot.MandelbrotColumn;
 import com.fractals.fractal.mandelbrot.MandelbrotConfig;
-import com.fractals.fractal.mandelbrot.impl.MandelbrotFactory;
+import com.fractals.fractal.mandelbrot.impl.Mandelbrot;
 
 /**
  *
@@ -39,46 +38,85 @@ public class Test {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // Create mandelbrot 
-        MandelbrotConfig config = MandelbrotFactory.getConfig()
-                .setWidth(120)
-                .setHeight(80);
-
-        Mandelbrot fractal = MandelbrotFactory.generate(config);
-        MandelbrotColumn[][] grid = fractal.getGrid();
-
+        // Instansiate mandelbrot fractal
+        Mandelbrot fractal = new Mandelbrot();
+                
+        Test.PngRenderTest(fractal);
+        Test.AsciiRenderTest(fractal);
+        Test.CustomRenderTest(fractal);
+    }
+    
+    /**
+     * Render fractal using png renderer
+     */
+    private static void PngRenderTest(com.fractals.fractal.mandelbrot.Mandelbrot fractal) {
+        fractal.getConfig()
+                .setWidth(800)
+                .setHeight(600);
+                
+        fractal.process();
         
-        // 1. Output mandelbrot using formatter
+        // TODO: add check whether fractal is done processing when we implement
+        // parallel processing
+        System.out.println("Renderer: " + AsciiRenderer.class);
         System.out.println(new String(new AsciiRenderer().Render(fractal)));
         System.out.println("Execution time (ms): " + fractal.getExecutionTime() + ", Total iterations: " + fractal.getIterations());                           
-        
-        
-        // 2. Output mandelbrot without using formatter, using letters for the
-        // different match types
-        if(fractal.isDone()) {
-            for(MandelbrotColumn[] row: grid) {
-                for(MandelbrotColumn column: row) {                              
-                    switch(column.getMatchType()) {
-                        case CARDIOID:
-                            System.out.print("C");
-                            break;
-                        case BULB:
-                            System.out.print("B");
-                            break;
-                        case PERIOD:
-                            System.out.print("P");
-                            break;
-                        case MAX:
-                            System.out.print("M");
-                            break;
-                        case NONE:
-                            System.out.print(" ");
-                            break;
-                    }
-                }
-                System.out.println();
-            }
-            System.out.println("Execution time (ms): " + fractal.getExecutionTime() + ", Total iterations: " + fractal.getIterations());
-        }
     }
+    
+    /**
+     * Render fractal using ascii renderer
+     */    
+    private static void AsciiRenderTest(com.fractals.fractal.mandelbrot.Mandelbrot fractal) {
+        fractal.getConfig()
+                .setWidth(120)
+                .setHeight(80);
+                
+        fractal.process();
+        
+        // TODO: add check whether fractal is done processing when we implement
+        // parallel processing
+        System.out.println("Renderer: " + AsciiRenderer.class);
+        System.out.println(new String(new AsciiRenderer().Render(fractal)));
+        System.out.println("Execution time (ms): " + fractal.getExecutionTime() + ", Total iterations: " + fractal.getIterations());                           
+    }
+    
+    /**
+     * Render fractal using custom renderer
+     * 
+     * This to test the different match types
+     */
+    private static void CustomRenderTest(com.fractals.fractal.mandelbrot.Mandelbrot fractal) {
+        fractal.getConfig()
+                .setWidth(120)
+                .setHeight(80);
+                
+        fractal.process();
+        
+        // TODO: add check whether fractal is done processing when we implement
+        // parallel processing
+        System.out.println("Renderer: custom");
+        for(MandelbrotColumn[] row: fractal.getGrid()) {
+            for(MandelbrotColumn column: row) {                              
+                switch(column.getMatchType()) {
+                    case CARDIOID:
+                        System.out.print("C");
+                        break;
+                    case BULB:
+                        System.out.print("B");
+                        break;
+                    case PERIOD:
+                        System.out.print("P");
+                        break;
+                    case MAX:
+                        System.out.print("M");
+                        break;
+                    case NONE:
+                        System.out.print(" ");
+                        break;
+                }
+            }
+            System.out.println();
+        }
+        System.out.println("Execution time (ms): " + fractal.getExecutionTime() + ", Total iterations: " + fractal.getIterations());
+    } 
 }

@@ -28,7 +28,21 @@ package com.fractals.fractal.generic;
  * @author martinr
  */
 public interface Generic {
-        
+    
+    /**
+     * Starts processing a fractal
+     */
+    public void process();
+    
+    /**
+     * Returns configuration set for fractal
+     * 
+     * Use this to configure the fractal
+     * 
+     * @return 
+     */
+    public com.fractals.fractal.generic.GenericConfig getConfig();    
+    
     /**
      * Returns a grid of fractal columns
      * 
@@ -39,8 +53,8 @@ public interface Generic {
      * 
      * @return 
      */
-    public com.fractals.fractal.generic.GenericColumn[][] getGrid();   
-
+    public com.fractals.fractal.generic.GenericColumn[][] getGrid();       
+    
     /**
      * Returns the execution time in milliseconds
      * 
@@ -61,6 +75,13 @@ public interface Generic {
      * @return 
      */
     public int getProgress();
+    
+    /**
+     * Returns whether the generation is in progress or not
+     * 
+     * @return 
+     */
+    public boolean inProgress();
     
     /**
      * Returns whether the generation is done or not

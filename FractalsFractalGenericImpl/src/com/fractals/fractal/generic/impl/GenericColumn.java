@@ -28,14 +28,36 @@ package com.fractals.fractal.generic.impl;
  * @author martinr
  */
 public abstract class GenericColumn implements com.fractals.fractal.generic.GenericColumn {
+    private final int rowPos;
+    private final int columnPos;
     private final int iterations;
     private final boolean inSet;
     
-    public GenericColumn(int iterations, boolean inSet) {
+    /***
+     * Constructor
+     * 
+     * @param rowPos
+     * @param columnPos
+     * @param iterations
+     * @param inSet 
+     */
+    public GenericColumn(int rowPos, int columnPos, int iterations, boolean inSet) {
+        this.rowPos = rowPos;
+        this.columnPos = columnPos;
         this.iterations = iterations;
         this.inSet = inSet;        
     }
 
+    @Override
+    public int getRowPos() {
+        return this.rowPos;
+    }
+    
+    @Override
+    public int getColumnPos() {
+        return this.columnPos;
+    }
+    
     @Override
     public int getIterations() {
         return this.iterations;

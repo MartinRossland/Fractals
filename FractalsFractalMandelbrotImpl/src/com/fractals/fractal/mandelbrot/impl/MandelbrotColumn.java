@@ -39,12 +39,14 @@ public class MandelbrotColumn
      * Made this protected to make sure it only can be initialized within this
      * package
      * 
+     * @param rowPos
+     * @param columnPos
      * @param iterations
      * @param inSet
      * @param matchType 
      */
-    protected MandelbrotColumn(int iterations, boolean inSet, MatchType matchType) {
-        super(iterations, inSet);
+    protected MandelbrotColumn(int rowPos, int columnPos, int iterations, boolean inSet, MatchType matchType) {
+        super(rowPos, columnPos, iterations, inSet);
         this.matchType = matchType;
     }
 

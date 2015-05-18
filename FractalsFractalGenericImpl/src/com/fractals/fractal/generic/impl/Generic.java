@@ -31,18 +31,7 @@ public abstract class Generic implements com.fractals.fractal.generic.Generic {
     protected int iterations;
     protected int columns;
     protected int processedColumns;
-    protected long executionTime;
-    
-    /**
-     * Constructor
- 
- Generic generation will run in a separate thread
-     * 
-     * @param config 
-     */
-    protected Generic(com.fractals.fractal.generic.GenericConfig config) {
-        this.columns = config.getWidth() * config.getHeight();
-    }
+    protected long executionTime;   
     
     @Override
     public long getExecutionTime() {
@@ -56,9 +45,17 @@ public abstract class Generic implements com.fractals.fractal.generic.Generic {
     
     @Override
     public int getProgress() {
+        if(this.columns == 0) {
+            return this.isDone() ? 100 : 0;
+        }
         return (this.processedColumns * 100) / this.columns;
     }
 
+    @Override
+    public boolean inProgress() {
+        return this.executionTime > 0 && !this.isDone();
+    } 
+    
     @Override
     public boolean isDone() {
         return this.columns == this.processedColumns;

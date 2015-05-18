@@ -30,6 +30,19 @@ package com.fractals.fractal.generic;
 public interface GenericColumn {
     
     /**
+     * Returns the columns position in row
+     * @return 
+     */
+    public int getRowPos();
+    
+    /**
+     * Returns the column position
+     * 
+     * @return 
+     */
+    public int getColumnPos();
+    
+    /**
      * Return iterations used
      * 
      * @return 
@@ -37,7 +50,7 @@ public interface GenericColumn {
     public int getIterations();
     
     /**
-     * Return whether posX and posY is part of fractal set or not
+     * Return whether column is part of fractal set or not
      * 
      * @return 
      */

@@ -31,47 +31,51 @@ public class Mandelbrot
     extends com.fractals.fractal.generic.impl.Generic
     implements com.fractals.fractal.mandelbrot.Mandelbrot {
     
-    private final com.fractals.fractal.mandelbrot.MandelbrotConfig config;
-    private final com.fractals.fractal.mandelbrot.MandelbrotColumn[][] grid;
-    private final double rScale;
-    private final double iScale;
-    private final long executionStart;
-    
-    /**
-     * Constructor
-     * 
-     * Mandelbrot generation will run in a separate thread
-     * 
-     * @param config 
-     */
-    protected Mandelbrot(com.fractals.fractal.mandelbrot.MandelbrotConfig config) {                
-        super(config);       
+    private final com.fractals.fractal.mandelbrot.MandelbrotConfig config = new MandelbrotConfig();
+    private com.fractals.fractal.mandelbrot.MandelbrotColumn[][] grid;
+    private double rScale;
+    private double iScale;
+    private long executionStart;
+            
+    @Override
+    public void process() {
+        // Stop execution if process is already running
+        if(this.inProgress()) {
+            throw new IllegalStateException("Can not run process when the a process is already running.");
+        }
+
+        // Reset columns
+        this.columns = this.config.getWidth() * this.config.getHeight();
+        // Reset processed columns
+        this.processedColumns = 0;        
         
-        this.config = config;
         // Grids contains rows and columns representing a row for every vertical
         // height units and a column for every horizontal width units
-        this.grid = new MandelbrotColumn[this.config.getHeight()][this.config.getWidth()];
+        this.grid = new MandelbrotColumn[this.config.getHeight()][this.config.getWidth()];                        
         // Scale from grid to complex plane real value (x-axis)
         this.rScale = (this.config.getReMax() - this.config.getReMin()) / this.config.getWidth();
         // Scale from grid to complex plane imaginary value (y-axis)
         this.iScale = (this.config.getImMax() - this.config.getImMin()) / this.config.getHeight();
-        
         // Set execution start time
         this.executionStart = System.currentTimeMillis();
-        
-        this.process();
-    }
-    
-    /**
-     * Process mandelbrot set
-     */
-    private void process() {
+                
+        // TODO: run column processing in paralell 
         for(int rowPos = 0; rowPos < this.config.getHeight(); rowPos++) {                        
             for(int columnPos = 0; columnPos < this.config.getWidth(); columnPos++) {
                 this.processColumn(rowPos, columnPos);
             }
         }
     }
+    
+    @Override
+    public com.fractals.fractal.mandelbrot.MandelbrotConfig getConfig() {
+        return this.config;
+    }
+    
+    @Override
+    public com.fractals.fractal.mandelbrot.MandelbrotColumn[][] getGrid() {
+        return this.grid;
+    } 
     
     /**
      * Process mandelbrot set column
@@ -149,6 +153,8 @@ public class Mandelbrot
     private void updateGrid(int rowPos, int columnPos, int iterations, com.fractals.fractal.mandelbrot.MandelbrotColumn.MatchType matchType) {
         this.grid[rowPos][columnPos] = 
                         new MandelbrotColumn(
+                                rowPos,
+                                columnPos,
                                 iterations, 
                                 matchType != com.fractals.fractal.mandelbrot.MandelbrotColumn.MatchType.NONE, 
                                 matchType);
@@ -224,10 +230,5 @@ public class Mandelbrot
         }
         
         return false;
-    }
-    
-    @Override
-    public com.fractals.fractal.mandelbrot.MandelbrotColumn[][] getGrid() {
-        return this.grid;
-    }
+    }          
 }

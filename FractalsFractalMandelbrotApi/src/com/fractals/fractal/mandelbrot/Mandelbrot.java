@@ -29,5 +29,8 @@ package com.fractals.fractal.mandelbrot;
  */
 public interface Mandelbrot extends com.fractals.fractal.generic.Generic {    
     @Override
+    public com.fractals.fractal.mandelbrot.MandelbrotConfig getConfig();
+    
+    @Override
     public com.fractals.fractal.mandelbrot.MandelbrotColumn[][] getGrid();
 }
