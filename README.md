@@ -11,17 +11,18 @@ What is fractals and what is mandelbrot:
 
   - Mandelbrot
 
-### Implemented fractal formatters:
+### Implemented fractal renders:
 
-  - Ascii formatter
+  - Ascii renderer
+  - Png renderer
 
 ### Todo: 
   
   - Solve issue with build order
   - Add unit tests
+  - Add generic factory for instantiating fractals
   - Add thread processing for mandelbrot implementation
-  - Add image formatter for creating amazing fractal images
-  - Add configuration for formatters
+  - Add configuration for renders
   - Add user interface
     - zoom capabilities
     - animations
