@@ -29,9 +29,9 @@ package com.fractal.impl;
  */
 public abstract class FractalConfig implements com.fractal.FractalConfig {
     // Setting default configurations
-    protected int width = 640;
-    protected int height = 480;
-    protected int maxIterations = 1000;
+    private int width = 640;
+    private int height = 480;
+    private int maxIterations = 1000;
     
     @Override
     public com.fractal.FractalConfig setWidth(int width) {

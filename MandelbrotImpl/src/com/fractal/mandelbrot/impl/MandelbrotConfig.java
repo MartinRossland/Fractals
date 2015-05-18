@@ -48,19 +48,19 @@ public class MandelbrotConfig
     
     @Override
     public com.fractal.mandelbrot.MandelbrotConfig setWidth(int width) {
-        this.width = width;
+        super.setWidth(width);
         return this;
     }
 
     @Override
     public com.fractal.mandelbrot.MandelbrotConfig setHeight(int height) {
-        this.height = height;
+        super.setHeight(height);
         return this;
     }
 
     @Override
     public com.fractal.mandelbrot.MandelbrotConfig setMaxIterations(int maxIterations) {
-        this.maxIterations = maxIterations;
+        super.setMaxIterations(maxIterations);
         return this;
     }
     
