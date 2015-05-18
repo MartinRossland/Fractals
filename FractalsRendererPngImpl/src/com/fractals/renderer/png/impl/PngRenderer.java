@@ -82,13 +82,14 @@ public class PngRenderer implements com.fractals.renderer.generic.GenericRendere
         }
         
         // TODO: Rewrite
-        int maxColor = 510;
-        int iterationColor = (iterations * maxColor) / maxIterations;
+        int max = 300;
+        int start = 75;
+        int iterationColor = (iterations * max) / maxIterations;               
         
         return new Color(
-                iterationColor > 255 ? maxColor - iterationColor : 0,
+                iterationColor + start > 250 ? (max + start) - iterationColor : 0,
                 0,
-                iterationColor > 255 ? 255 : iterationColor        
+                iterationColor + start > 250 ? 250 : iterationColor + start        
         ).getRGB();
         
     }

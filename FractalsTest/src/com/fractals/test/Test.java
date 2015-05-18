@@ -24,9 +24,17 @@
 package com.fractals.test;
 
 import com.fractals.renderer.ascii.impl.AsciiRenderer;
+import com.fractals.renderer.png.impl.PngRenderer;
 import com.fractals.fractal.mandelbrot.MandelbrotColumn;
-import com.fractals.fractal.mandelbrot.MandelbrotConfig;
 import com.fractals.fractal.mandelbrot.impl.Mandelbrot;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -37,11 +45,11 @@ public class Test {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         // Instansiate mandelbrot fractal
         Mandelbrot fractal = new Mandelbrot();
                 
-        Test.PngRenderTest(fractal);
+        Test.PngRenderTest(fractal);        
         Test.AsciiRenderTest(fractal);
         Test.CustomRenderTest(fractal);
     }
@@ -49,18 +57,35 @@ public class Test {
     /**
      * Render fractal using png renderer
      */
-    private static void PngRenderTest(com.fractals.fractal.mandelbrot.Mandelbrot fractal) {
+    private static void PngRenderTest(com.fractals.fractal.mandelbrot.Mandelbrot fractal) throws FileNotFoundException, IOException {
         fractal.getConfig()
-                .setWidth(800)
-                .setHeight(600);
+                .setWidth(1920)
+                .setHeight(1200)
+                .setMaxIterations(50);
                 
-        fractal.process();
-        
+        System.out.println("Renderer: " + PngRenderer.class);
+
+        fractal.process();        
+                         
         // TODO: add check whether fractal is done processing when we implement
-        // parallel processing
-        System.out.println("Renderer: " + AsciiRenderer.class);
-        System.out.println(new String(new AsciiRenderer().Render(fractal)));
-        System.out.println("Execution time (ms): " + fractal.getExecutionTime() + ", Total iterations: " + fractal.getIterations());                           
+        // parallel processing   
+        File file = new File(System.getenv("HOME"), "mandelbrot.png");        
+        
+        // Create file if not exists
+        if(file.exists()) {
+            file.createNewFile();
+        }
+
+        // Write rendered byte stream to file
+        FileOutputStream stream = new FileOutputStream(file);        
+        try {
+            stream.write(new PngRenderer().Render(fractal));                       
+        } finally {
+            stream.close();
+        }
+        
+        System.out.println("File successfully created [" + file.getAbsolutePath() + "].");                
+        System.out.println("Execution time (ms): " + fractal.getExecutionTime() + ", Total iterations: " + fractal.getIterations() + "\n");       
     }
     
     /**
@@ -71,13 +96,14 @@ public class Test {
                 .setWidth(120)
                 .setHeight(80);
                 
+        System.out.println("Renderer: " + AsciiRenderer.class);
+        
         fractal.process();
         
         // TODO: add check whether fractal is done processing when we implement
-        // parallel processing
-        System.out.println("Renderer: " + AsciiRenderer.class);
+        // parallel processing        
         System.out.println(new String(new AsciiRenderer().Render(fractal)));
-        System.out.println("Execution time (ms): " + fractal.getExecutionTime() + ", Total iterations: " + fractal.getIterations());                           
+        System.out.println("Execution time (ms): " + fractal.getExecutionTime() + ", Total iterations: " + fractal.getIterations() + "\n");                           
     }
     
     /**
@@ -90,11 +116,12 @@ public class Test {
                 .setWidth(120)
                 .setHeight(80);
                 
+        System.out.println("Renderer: custom");
+        
         fractal.process();
         
         // TODO: add check whether fractal is done processing when we implement
-        // parallel processing
-        System.out.println("Renderer: custom");
+        // parallel processing        
         for(MandelbrotColumn[] row: fractal.getGrid()) {
             for(MandelbrotColumn column: row) {                              
                 switch(column.getMatchType()) {
@@ -117,6 +144,6 @@ public class Test {
             }
             System.out.println();
         }
-        System.out.println("Execution time (ms): " + fractal.getExecutionTime() + ", Total iterations: " + fractal.getIterations());
+        System.out.println("Execution time (ms): " + fractal.getExecutionTime() + ", Total iterations: " + fractal.getIterations() + "\n");
     } 
 }
