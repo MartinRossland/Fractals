@@ -16,7 +16,8 @@ What is fractals and what is mandelbrot:
   - Ascii formatter
 
 ### Todo: 
-
+  
+  - Solve issue with build order
   - Add unit tests
   - Add thread processing for mandelbrot implementation
   - Add image formatter for creating amazing fractal images
