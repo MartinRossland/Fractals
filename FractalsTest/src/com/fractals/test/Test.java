@@ -25,16 +25,12 @@ package com.fractals.test;
 
 import com.fractals.renderer.ascii.impl.AsciiRenderer;
 import com.fractals.renderer.png.impl.PngRenderer;
-import com.fractals.fractal.mandelbrot.MandelbrotColumn;
+import com.fractals.fractal.mandelbrot.MandelbrotPoint;
 import com.fractals.fractal.mandelbrot.impl.Mandelbrot;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -49,7 +45,7 @@ public class Test {
         // Instansiate mandelbrot fractal
         Mandelbrot fractal = new Mandelbrot();
                 
-        Test.PngRenderTest(fractal);        
+        //Test.PngRenderTest(fractal);        
         Test.AsciiRenderTest(fractal);
         Test.CustomRenderTest(fractal);
     }
@@ -59,9 +55,9 @@ public class Test {
      */
     private static void PngRenderTest(com.fractals.fractal.mandelbrot.Mandelbrot fractal) throws FileNotFoundException, IOException {
         fractal.getConfig()
-                .setWidth(1920)
-                .setHeight(1200)
-                .setMaxIterations(1000);
+                .setWidth(800)
+                .setHeight(457)
+                .setMaxIterations(50);
                 
         System.out.println("Renderer: " + PngRenderer.class);
 
@@ -71,7 +67,7 @@ public class Test {
         // parallel processing   
         File file = new File(
                 System.getenv("HOME"), 
-                "mandelbrot-" + fractal.getConfig().getWidth() + "x" + fractal.getConfig().getWidth() + "-" + fractal.getConfig().getMaxIterations() + "i.png");        
+                "mandelbrot-" + fractal.getConfig().getWidth() + "x" + fractal.getConfig().getHeight() + "-" + fractal.getConfig().getMaxIterations() + "i.png");        
         
         // Create file if not exists
         if(file.exists()) {
@@ -124,9 +120,9 @@ public class Test {
         
         // TODO: add check whether fractal is done processing when we implement
         // parallel processing        
-        for(MandelbrotColumn[] row: fractal.getGrid()) {
-            for(MandelbrotColumn column: row) {                              
-                switch(column.getMatchType()) {
+        for(MandelbrotPoint[] row: fractal.getCanvas()) {
+            for(MandelbrotPoint point: row) {                              
+                switch(point.getMatchType()) {
                     case CARDIOID:
                         System.out.print("C");
                         break;
@@ -139,7 +135,8 @@ public class Test {
                     case MAX:
                         System.out.print("M");
                         break;
-                    case NONE:
+                    case BAILOUT:
+                    default:
                         System.out.print(" ");
                         break;
                 }

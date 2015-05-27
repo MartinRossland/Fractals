@@ -106,20 +106,34 @@ public interface MandelbrotConfig extends com.fractals.fractal.generic.GenericCo
      */
     public double getImMax();
     
+  
     /**
-     * Set periodicity check precision
+     * Set bailout value
      * 
-     * Example: 1e-7
+     * @param bailout
+     * @return 
+     */
+    public MandelbrotConfig setBailoutValue(double bailoutValue);
+    
+    /**
+     * Get bailout value
      * 
-     * @param periodicityCheckPrecision 
+     * @return bailout value
+     */
+    public double getBailoutValue();
+    
+    /**
+     * Set periodicity check decimal precision
+     * 
+     * @param periodicityPrecision 
      * @return  
      */
-    public MandelbrotConfig setPeriodicityCheckPrecision(double periodicityCheckPrecision);
+    public MandelbrotConfig setPeriodicityPrecision(double periodicityCheckPrecision);
     
     /**
      * Get periodicity check precision
      * 
      * @return 
      */
-    public double getPeriodicityCheckPrecision();
+    public double getPeriodicityPrecision();
 }

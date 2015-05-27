@@ -36,7 +36,9 @@ public class MandelbrotConfig
     private double reMax = 1;
     private double imMin = -1;
     private double imMax = 1;
-    private double periodicityCheckPrecision = 1e-7;    
+    private double bailoutValue = 4;
+    private double periodicityCheckPrecision = 1e-7;
+    
     
     /**
      * Constructor
@@ -109,13 +111,24 @@ public class MandelbrotConfig
     }
 
     @Override
-    public com.fractals.fractal.mandelbrot.MandelbrotConfig setPeriodicityCheckPrecision(double periodicityCheckPrecision) {
+    public com.fractals.fractal.mandelbrot.MandelbrotConfig setBailoutValue(double bailoutValue) {
+        this.bailoutValue = bailoutValue;
+        return this;
+    }
+
+    @Override
+    public double getBailoutValue() {
+        return this.bailoutValue;
+    }  
+    
+    @Override
+    public com.fractals.fractal.mandelbrot.MandelbrotConfig setPeriodicityPrecision(double periodicityCheckPrecision) {
         this.periodicityCheckPrecision = periodicityCheckPrecision;
         return this;
     }
 
     @Override
-    public double getPeriodicityCheckPrecision() {
+    public double getPeriodicityPrecision() {
         return this.periodicityCheckPrecision;
     }        
 }

@@ -32,5 +32,5 @@ public interface Mandelbrot extends com.fractals.fractal.generic.Generic {
     public com.fractals.fractal.mandelbrot.MandelbrotConfig getConfig();
     
     @Override
-    public com.fractals.fractal.mandelbrot.MandelbrotColumn[][] getGrid();
+    public com.fractals.fractal.mandelbrot.MandelbrotPoint[][] getCanvas();
 }

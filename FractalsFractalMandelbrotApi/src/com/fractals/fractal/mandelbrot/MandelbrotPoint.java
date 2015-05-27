@@ -27,11 +27,11 @@ package com.fractals.fractal.mandelbrot;
  *
  * @author martinr
  */
-public interface MandelbrotColumn extends com.fractals.fractal.generic.GenericColumn {
+public interface MandelbrotPoint extends com.fractals.fractal.generic.GenericPoint {
     /**
      * Enumeration containing different match types
      */
-    public enum MatchType { CARDIOID, BULB, PERIOD, MAX, NONE }
+    public enum MatchType { CARDIOID, BULB, PERIOD, MAX, NONE, BAILOUT }
     
     /**
      * Return match type

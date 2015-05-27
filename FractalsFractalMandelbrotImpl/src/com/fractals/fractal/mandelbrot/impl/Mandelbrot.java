@@ -32,9 +32,7 @@ public class Mandelbrot
     implements com.fractals.fractal.mandelbrot.Mandelbrot {
     
     private final com.fractals.fractal.mandelbrot.MandelbrotConfig config = new MandelbrotConfig();
-    private com.fractals.fractal.mandelbrot.MandelbrotColumn[][] grid;
-    private double rScale;
-    private double iScale;
+    private com.fractals.fractal.mandelbrot.MandelbrotPoint[][] canvas;
     private long executionStart;
             
     @Override
@@ -44,27 +42,42 @@ public class Mandelbrot
             throw new IllegalStateException("Can not run process when the a process is already running.");
         }
 
-        // Reset columns
-        this.columns = this.config.getWidth() * this.config.getHeight();
-        // Reset processed columns
-        this.processedColumns = 0;        
+        // Reset points
+        this.points = this.config.getWidth() * this.config.getHeight();
+        // Reset processed points
+        this.processedPoints = 0;        
         
-        // Grids contains rows and columns representing a row for every vertical
+        // Grids contains rows and points representing a row for every vertical
         // height units and a column for every horizontal width units
-        this.grid = new MandelbrotColumn[this.config.getHeight()][this.config.getWidth()];                        
-        // Scale from grid to complex plane real value (x-axis)
-        this.rScale = (this.config.getReMax() - this.config.getReMin()) / this.config.getWidth();
-        // Scale from grid to complex plane imaginary value (y-axis)
-        this.iScale = (this.config.getImMax() - this.config.getImMin()) / this.config.getHeight();
+        this.canvas = new MandelbrotPoint[this.config.getHeight()][this.config.getWidth()];                        
+        
+        // Scale from canvas to plane
+        double scaleX = this.calculateScaleX(this.config.getReMin(), this.config.getReMax(), this.config.getWidth());
+        double scaleY = this.calculateScaleY(this.config.getImMin(), this.config.getImMax(), this.config.getHeight());
+
         // Set execution start time
         this.executionStart = System.currentTimeMillis();
                 
         // TODO: run column processing in paralell 
-        for(int rowPos = 0; rowPos < this.config.getHeight(); rowPos++) {                        
-            for(int columnPos = 0; columnPos < this.config.getWidth(); columnPos++) {
-                this.processColumn(rowPos, columnPos);
+        for(int canvasY = 0; canvasY < this.config.getHeight(); canvasY++) {                       
+            double y0 = this.calculatePositionX(this.config.getImMin(), scaleY, canvasY);                
+            for(int canvasX = 0; canvasX < this.config.getWidth(); canvasX++) {
+                double x0 = this.calculatePositionX(this.config.getReMin(), scaleX, canvasX);                
+                this.canvas[canvasY][canvasX] = this.processPoint(
+                        x0,
+                        y0,
+                        this.config.getBailoutValue(),
+                        this.config.getMaxIterations(),
+                        this.config.getPeriodicityPrecision());
+                
+                this.iterations += this.canvas[canvasY][canvasX].getIterations();
+                this.processedPoints++;
             }
-        }
+        }           
+        
+        // Set execition time
+        // TODO: change this when doing paralell processing
+        this.executionTime = System.currentTimeMillis() - this.executionStart;
     }
     
     @Override
@@ -73,112 +86,144 @@ public class Mandelbrot
     }
     
     @Override
-    public com.fractals.fractal.mandelbrot.MandelbrotColumn[][] getGrid() {
-        return this.grid;
+    public com.fractals.fractal.mandelbrot.MandelbrotPoint[][] getCanvas() {
+        return this.canvas;
     } 
     
     /**
-     * Process mandelbrot set column
+     * Process mandelbrot point
      * 
-     * @param rowPos
-     * @param columnPos 
+     * Process whether point tends towards infinity or not. If it tends towards
+     * infinity it's not part of the mandelbrot set. 
+     * 
+     * Have following checks to
+     * reduce amount of iterations:
+     * - cardioid check
+     * - period-2 bulb check
+     * - periodicity check
+     * 
+     * @param x0 x position in plane
+     * @param y0 y posotion in plane
+     * @param bailoutValue
+     * @param maxIterations
+     * @param periodicityPrecision
+     * @return MandelbrotPoint - iterations, inset, type
      */
-    private void processColumn(int rowPos, int columnPos) {        
-        // Find canvas x-axis position in complex plane
-        double cRe = (columnPos * rScale) + this.config.getReMin();     
-        
-        // Find canvas y-axis position in complex plane
-        double cIm = (rowPos * iScale) + this.config.getImMin();        
-        
+    private com.fractals.fractal.mandelbrot.MandelbrotPoint processPoint(double x0, double y0, double bailoutValue, int maxIterations, double periodicityPrecision) {                     
+        // Start sequence of x and y
         double[] xy = {0, 0};        
-        int iterations = 0;
+        
+        // Iterations
+        int i = 0;
         
         // Cardioid check to save iterative checks
-        if(this.isCardioid(cRe, cIm)) {
-            this.updateGrid(rowPos, columnPos, iterations, com.fractals.fractal.mandelbrot.MandelbrotColumn.MatchType.CARDIOID);
-            return;
+        if(this.isCardioid(x0, y0)) {
+            return new MandelbrotPoint(i, true, com.fractals.fractal.mandelbrot.MandelbrotPoint.MatchType.CARDIOID);
         }
-        
-        
+                
         // Period-2 bulb check to save iterative checks
-        if(this.isPeriod2Bulb(cRe, cIm)) {
-            this.updateGrid(rowPos, columnPos, iterations, com.fractals.fractal.mandelbrot.MandelbrotColumn.MatchType.BULB);
-            return;
+        if(this.isPeriod2Bulb(x0, y0)) {
+            return new MandelbrotPoint(i, true, com.fractals.fractal.mandelbrot.MandelbrotPoint.MatchType.BULB);
         }
         
-        // Check if column is part of the mandel brot set. If max iteration
-        // is reached or periodicity checks bails out, the column is will
-        // be part of the mandelbrot set.
-        while(xy[0]*xy[0] + xy[1]*xy[1] <= 4 && iterations < this.config.getMaxIterations()) {                  
-            iterations++;                    
-            xy = this.calculateXY(cRe, cIm, xy);                     
+        // Run sequence to see if part of the mandelbrot set
+        while(i++ < maxIterations) {                                     
+            xy = this.nextSequence(x0, y0, xy[0], xy[1]);                     
 
+            // Check if it's within bailout bounderies
+            if(this.isBailout(xy[0], xy[1], bailoutValue)) {
+                return new MandelbrotPoint(i, false, com.fractals.fractal.mandelbrot.MandelbrotPoint.MatchType.BAILOUT);
+            }
+            
             // Periodicity check to save iterative checks
-            if(this.isPeriodicity(cRe, cIm, xy)) {                
-                this.updateGrid(rowPos, columnPos, iterations, com.fractals.fractal.mandelbrot.MandelbrotColumn.MatchType.PERIOD);
-                return;
+            if(this.isPeriodicity(x0, y0, xy[0], xy[1], periodicityPrecision)) {
+                return new MandelbrotPoint(i, true, com.fractals.fractal.mandelbrot.MandelbrotPoint.MatchType.PERIOD);
             } 
         }
         
-        // Add final result to grid
-        this.updateGrid(rowPos, columnPos, iterations);                
+        // If max iteration is reached, it's part of the set
+        return new MandelbrotPoint(i, true, com.fractals.fractal.mandelbrot.MandelbrotPoint.MatchType.PERIOD);
     }
     
     /**
-     * Updates grid with processed result
+     * Calculate x scale between canvas and plane
      * 
-     * @param rowPos
-     * @param columnPos
-     * @param iterations
-     * @param matchType 
+     * Equation:
+     * x = (reMax - reMin) / canvasWidth
+     * 
+     * @param reMin
+     * @param reMax
+     * @param canvasWidth
+     * @return Scale x and y
      */
-    private void updateGrid(int rowPos, int columnPos, int iterations) {
-        this.updateGrid(
-                rowPos,
-                columnPos,
-                iterations, 
-                iterations == this.config.getMaxIterations()
-                    ? com.fractals.fractal.mandelbrot.MandelbrotColumn.MatchType.MAX
-                    : com.fractals.fractal.mandelbrot.MandelbrotColumn.MatchType.NONE);
+    private double calculateScaleX(double reMin, double reMax, int canvasWidth) {
+        return (reMax - reMin) / canvasWidth;
     }
     
     /**
-     * Updates grid with processed result
+     * Calculate y scale between canvas and plane
      * 
-     * @param rowPos
-     * @param columnPos
-     * @param iterations
-     * @param matchType 
+     * Equation:
+     * y = (imMax - imMin) / canvasHeight
+     * 
+     * @param imMin
+     * @param imMax
+     * @param canvasHeight
+     * @return Scale x and y
      */
-    private void updateGrid(int rowPos, int columnPos, int iterations, com.fractals.fractal.mandelbrot.MandelbrotColumn.MatchType matchType) {
-        this.grid[rowPos][columnPos] = 
-                        new MandelbrotColumn(
-                                rowPos,
-                                columnPos,
-                                iterations, 
-                                matchType != com.fractals.fractal.mandelbrot.MandelbrotColumn.MatchType.NONE, 
-                                matchType);
-        
-        this.iterations += iterations;
-        this.processedColumns++;
-        
-        // Set execution time if  
-       if(this.isDone()) {
-            this.executionTime = System.currentTimeMillis() - this.executionStart;
-        }
+    private double calculateScaleY(double imMin, double imMax, int canvasHeight) {
+        return (imMax - imMin) / canvasHeight;
     }
     
     /**
-     * Calculate xy positions
+     * Calculate x0 position in plane
      * 
-     * @param cRe Canvas x-axis position in complex plane
-     * @param cIm Canvas y-axis position in complex plane
-     * @param xy Current xy position
-     * @return New xy position
+     * Equation:
+     * x0 = (canvasX * scaleX) + reMax;
+     * y0 = (canvasY * scaleY) + imMin;
+     * 
+     * @param reMin
+     * @param scaleX
+     * @param canvasX
+     * @return Position x0
      */
-    private double[] calculateXY(double cRe, double cIm, double[] xy) {
-        double[] newXY = {xy[0]*xy[0] - xy[1]*xy[1] + cRe, 2*xy[0]*xy[1] + cIm};
-        return newXY;
+    private double calculatePositionX(double reMin, double scaleX, int canvasX) {
+        return (canvasX * scaleX) + reMin;
+    }
+    
+    /**
+     * Calculate y0 position in plane
+     * 
+     * Equation:
+     * y0 = (canvasY * scaleY) + imMin;
+     * 
+     * @param imMin
+     * @param scaleY
+     * @param canvasY
+     * @return 
+     */
+    private double calculatePositionY(double imMin, double scaleY, int canvasY) {
+        return (canvasY * scaleY) + imMin;
+    }
+    
+    /**
+     * Calculate next sequence
+     * 
+     * Equation:
+     * x = Re(z^2+c) = x^2 - y^2 + x0
+     * y = Im(z2+c) = 2xy+y0
+     * 
+     * @param x0 Canvas x position in complex plane
+     * @param y0 Canvas y position in complex plane
+     * @param x Current x in sequence
+     * @param y Current y in sequence
+     * @return Next x and y sequence
+     */
+    private double[] nextSequence(double x0, double y0, double x, double y) {
+        return new double[] {
+            x*x - y*y + x0,
+            2*x*y + y0
+        };
     }
     
     /**
@@ -206,29 +251,56 @@ public class Mandelbrot
      * Equation:
      * (x+1)^2 + y^2 < 0.0625
      * 
-     * @param x cRe
-     * @param y cIm
+     * @param x0 Canvas x position in complex plane
+     * @param y0 Canvas y position in complex plane
      */
-    private boolean isPeriod2Bulb(double x, double y) {
-        return (x+1)*(x+1) + y*y < 0.0625;         
+    private boolean isPeriod2Bulb(double x0, double y0) {
+        return (x0+1)*(x0+1) + y0*y0 < 0.0625;         
+    }
+    
+    /**
+     * Check for bailout    
+     * 
+     * Equation:
+     * x^2-y^2 >= bailout
+     * 
+     * @param x Current x in sequence
+     * @param y Current y in sequence
+     * @param bailout bailout value
+     */
+    private boolean isBailout(double x, double y, double bailout) {
+        return x*x + y*y >= bailout;
     }
     
     /**
      * Check for periodicity
      * 
-     * @param cRe Canvas x-axis position in complex plane
-     * @param cIm Canvas y-axis position in complex plane
-     * @param xy Current xy position
-     * @return Whether we hit a periodicity or not
+     * This will check for a sequence that will never hit infinity with a
+     * given precision
+     * 
+     * Example of sequence that will not hit infinity:
+     * 0, -1, 0, -1, 0, -1
+     * 
+     * Example of sequence that will hit infinity:
+     * 0, 1, 2, 5, 26, ...
+     * 
+     * @param x0 Canvas x position in complex plane
+     * @param y0 Canvas y position in complex plane
+     * @param x Current x in sequence
+     * @param y Current y in sequence
+     * @param precision decimal precision between sequences
+     * @return false if sequence hit infinity and true if not
      */
-    private boolean isPeriodicity(double cRe, double cIm, double[] xy) {
-        double[] xyCompare = this.calculateXY(cRe, cIm, this.calculateXY(cRe, cIm, xy));
+    private boolean isPeriodicity(double x0, double y0, double x, double y, double precision) {
+        // Compare two sequences ahead
+        double[] seq1 = this.nextSequence(x0, y0, x, y);
+        double[] seq2 = this.nextSequence(x0, y0, seq1[0], seq1[1]);       
                 
-        if(Math.abs(xy[0] - xyCompare[0]) < this.config.getPeriodicityCheckPrecision() &&
-                Math.abs(xy[1] - xyCompare[1]) < this.config.getPeriodicityCheckPrecision()) {
+        if(Math.abs(x - seq2[0]) < precision &&
+                Math.abs(y - seq2[1]) < precision) {
             return true;
         }
         
         return false;
-    }          
+    }    
 }

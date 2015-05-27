@@ -44,17 +44,18 @@ public class PngRenderer implements com.fractals.renderer.generic.GenericRendere
         }
                    
         BufferedImage image = new BufferedImage(fractal.getConfig().getWidth(), fractal.getConfig().getHeight(), BufferedImage.TYPE_INT_RGB);        
+        com.fractals.fractal.generic.GenericPoint[][] canvas = fractal.getCanvas();
         
-        for(com.fractals.fractal.generic.GenericColumn[] row: fractal.getGrid()) {
-            for(com.fractals.fractal.generic.GenericColumn column : row) {                                               
+        for(int y = 0; y < canvas.length; y++) {
+            for(int x = 0; x < canvas[y].length; x++) {
                 image.setRGB(
-                        column.getColumnPos(), 
-                        column.getRowPos(), 
+                        x, 
+                        y, 
                         getRgbColor(
-                                column.inSet(), 
-                                column.getIterations(), 
+                                canvas[y][x].inSet(), 
+                                canvas[y][x].getIterations(), 
                                 fractal.getConfig().getMaxIterations()));
-            }            
+            }
         }
         
         ByteArrayOutputStream output = new ByteArrayOutputStream();

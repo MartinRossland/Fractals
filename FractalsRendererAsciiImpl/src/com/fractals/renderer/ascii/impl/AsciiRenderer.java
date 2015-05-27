@@ -39,9 +39,9 @@ public class AsciiRenderer implements com.fractals.renderer.generic.GenericRende
         
         StringBuilder stringBuilder = new StringBuilder();
         
-        for(com.fractals.fractal.generic.GenericColumn[] row: fractal.getGrid()) {
-            for(com.fractals.fractal.generic.GenericColumn column : row) {
-                stringBuilder.append(column.inSet() ? "X" : " ");
+        for(com.fractals.fractal.generic.GenericPoint[] row: fractal.getCanvas()) {
+            for(com.fractals.fractal.generic.GenericPoint point : row) {
+                stringBuilder.append(point.inSet() ? "X" : " ");
             }
             stringBuilder.append("\n");
         }

@@ -44,16 +44,13 @@ public interface Generic {
     public com.fractals.fractal.generic.GenericConfig getConfig();    
     
     /**
-     * Returns a grid of fractal columns
-     * 
-     * Grids contains rows and columns representing a row for every vertical
-     * height units and a column for every horizontal width units
+     * Returns a canvas with points
      * 
      * The grid will not be complete before method isDone returns true
      * 
      * @return 
      */
-    public com.fractals.fractal.generic.GenericColumn[][] getGrid();       
+    public com.fractals.fractal.generic.GenericPoint[][] getCanvas();       
     
     /**
      * Returns the execution time in milliseconds

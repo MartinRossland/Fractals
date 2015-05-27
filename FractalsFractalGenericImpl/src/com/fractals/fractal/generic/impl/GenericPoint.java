@@ -21,37 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.fractals.fractal.mandelbrot.impl;
+package com.fractals.fractal.generic.impl;
 
 /**
  *
  * @author martinr
  */
-public class MandelbrotColumn 
-    extends com.fractals.fractal.generic.impl.GenericColumn 
-    implements com.fractals.fractal.mandelbrot.MandelbrotColumn {
-
-    private MatchType matchType;
-
-    /**
+public abstract class GenericPoint implements com.fractals.fractal.generic.GenericPoint {
+    private final int iterations;
+    private final boolean inSet;
+    
+    /***
      * Constructor
      * 
-     * Made this protected to make sure it only can be initialized within this
-     * package
-     * 
-     * @param rowPos
-     * @param columnPos
      * @param iterations
-     * @param inSet
-     * @param matchType 
+     * @param inSet 
      */
-    protected MandelbrotColumn(int rowPos, int columnPos, int iterations, boolean inSet, MatchType matchType) {
-        super(rowPos, columnPos, iterations, inSet);
-        this.matchType = matchType;
+    public GenericPoint(int iterations, boolean inSet) {
+        this.iterations = iterations;
+        this.inSet = inSet;        
+    }
+    
+    @Override
+    public int getIterations() {
+        return this.iterations;
     }
 
     @Override
-    public MatchType getMatchType() {
-        return this.matchType;
+    public boolean inSet() {
+        return this.inSet;
     }
 }

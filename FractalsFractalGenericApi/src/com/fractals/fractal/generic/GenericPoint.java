@@ -21,50 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.fractals.fractal.generic.impl;
+package com.fractals.fractal.generic;
 
 /**
  *
  * @author martinr
  */
-public abstract class GenericColumn implements com.fractals.fractal.generic.GenericColumn {
-    private final int rowPos;
-    private final int columnPos;
-    private final int iterations;
-    private final boolean inSet;
-    
-    /***
-     * Constructor
+public interface GenericPoint {       
+    /**
+     * Return iterations used
      * 
-     * @param rowPos
-     * @param columnPos
-     * @param iterations
-     * @param inSet 
+     * @return 
      */
-    public GenericColumn(int rowPos, int columnPos, int iterations, boolean inSet) {
-        this.rowPos = rowPos;
-        this.columnPos = columnPos;
-        this.iterations = iterations;
-        this.inSet = inSet;        
-    }
-
-    @Override
-    public int getRowPos() {
-        return this.rowPos;
-    }
+    public int getIterations();
     
-    @Override
-    public int getColumnPos() {
-        return this.columnPos;
-    }
-    
-    @Override
-    public int getIterations() {
-        return this.iterations;
-    }
-
-    @Override
-    public boolean inSet() {
-        return this.inSet;
-    }
+    /**
+     * Return whether column is part of fractal set or not
+     * 
+     * @return 
+     */
+    public boolean inSet();
 }

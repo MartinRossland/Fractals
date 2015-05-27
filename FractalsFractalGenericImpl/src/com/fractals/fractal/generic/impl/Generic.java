@@ -29,8 +29,8 @@ package com.fractals.fractal.generic.impl;
  */
 public abstract class Generic implements com.fractals.fractal.generic.Generic {
     protected int iterations;
-    protected int columns;
-    protected int processedColumns;
+    protected int points;
+    protected int processedPoints;
     protected long executionTime;   
     
     @Override
@@ -45,10 +45,10 @@ public abstract class Generic implements com.fractals.fractal.generic.Generic {
     
     @Override
     public int getProgress() {
-        if(this.columns == 0) {
+        if(this.points == 0) {
             return this.isDone() ? 100 : 0;
         }
-        return (this.processedColumns * 100) / this.columns;
+        return (this.processedPoints * 100) / this.points;
     }
 
     @Override
@@ -58,6 +58,6 @@ public abstract class Generic implements com.fractals.fractal.generic.Generic {
     
     @Override
     public boolean isDone() {
-        return this.columns == this.processedColumns;
+        return this.points == this.processedPoints;
     } 
 }
